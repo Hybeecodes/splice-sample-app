@@ -12,7 +12,7 @@ const environmentConfig = {
   dbHost: process.env.DB_HOST || 'localhost',
 };
 
-const AppDataSource = new DataSource({
+export const AppDataSource = new DataSource({
   type: 'postgres',
   host: environmentConfig.dbHost,
   port: environmentConfig.dbPort,
@@ -22,8 +22,6 @@ const AppDataSource = new DataSource({
   synchronize: false,
   logging: environmentConfig.nodeEnv !== 'production',
   autoLoadEntities: true,
-  migrations: ['src/shared/database/migrations/*.ts'],
+  migrations: ['dist/shared/database/migrations/*.js'],
   migrationsRun: true,
 } as DataSourceOptions);
-
-export default AppDataSource;

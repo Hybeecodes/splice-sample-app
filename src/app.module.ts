@@ -9,7 +9,7 @@ import { validateConfig } from './shared/config/env.validation';
 import { AppConfigService } from './shared/config/config.service';
 import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './modules/user/entities/user.entity';
+import { AppDataSource } from './shared/database/config/ormconfig';
 
 @Module({
   imports: [
@@ -17,27 +17,14 @@ import { User } from './modules/user/entities/user.entity';
       isGlobal: true,
       validate: validateConfig,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'hybeecodes',
-      password: '12345678',
-      database: 'splice_db',
-      synchronize: false,
-      logging: true,
-      autoLoadEntities: true,
-      entities: [User],
-      // migrations: ['src/shared/database/migrations/*.ts'],
-      // migrationsRun: true,
-    }),
+    TypeOrmModule.forRoot(AppDataSource.options),
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         pinoHttp: {
           transport:
-            configService.get('NODE_ENV') !== 'production'
+            configService.get<string>('NODE_ENV') !== 'production'
               ? {
                   target: 'pino-pretty',
                   options: { colorize: true, singleLine: true },
@@ -49,7 +36,7 @@ import { User } from './modules/user/entities/user.entity';
               return {
                 method: req.method,
                 url: req.url,
-                headers: req.headers,
+                headers: { ...req.headers, requestId: req.requestId },
               };
             },
             res(res) {
