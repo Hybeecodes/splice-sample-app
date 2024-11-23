@@ -1,15 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Components } from '../../../shared/constants/enumerations';
-import { UserRepository } from '../repositories/user.repository';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UserDto } from '../dtos/user.dto';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { IUserRepository } from '../interfaces/user.repository.interface';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(Components.USER_REPOSITORY)
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: IUserRepository,
     @InjectPinoLogger(UserService.name)
     private readonly logger: PinoLogger,
   ) {}

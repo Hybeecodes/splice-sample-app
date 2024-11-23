@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { IUserRepository } from '../interfaces/user.repository.interface';
 
 @Injectable()
-export class UserRepository extends Repository<User> {
+export class UserRepository
+  extends Repository<User>
+  implements IUserRepository
+{
   constructor(private dataSource: DataSource) {
     super(User, dataSource.createEntityManager());
   }
@@ -20,5 +24,9 @@ export class UserRepository extends Repository<User> {
   async updateUser(id: string, updates: Partial<User>): Promise<User> {
     await this.update(id, updates);
     return this.findOneBy({ id });
+  }
+
+  async findUserById(userId: string): Promise<User> {
+    return this.findOneBy({ id: userId });
   }
 }
